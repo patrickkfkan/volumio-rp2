@@ -1,18 +1,31 @@
-import { AlbumInfo, ArtistInfo, Episode, SongInfo } from "@patrickkfkan/rp.js";
-import { LRUCache } from "lru-cache";
+import {
+  AlbumInfo,
+  ArtistInfo,
+  Channel,
+  Episode,
+  EpisodeList,
+  SongInfo
+} from '@patrickkfkan/rp.js';
+import { LRUCache } from 'lru-cache';
 
 export type CacheKey =
+  | 'channels'
+  | `episodes-page-${string}`
   | `song-info-${string}`
   | `artist-info-${string}`
   | `album-info-${string}`
   | `episode-${string}`;
 export type CacheRecord<K extends CacheKey> =
-  K extends `song-info-${string}` ? Promise<SongInfo | null>
+  K extends 'channels' ? Promise<Channel[]>
+  : K extends `episodes-page-${string}` ? Promise<EpisodeList>
+  : K extends `song-info-${string}` ? Promise<SongInfo | null>
   : K extends `artist-info-${string}` ? Promise<ArtistInfo | null>
   : K extends `album-info-${string}` ? Promise<AlbumInfo | null>
   : K extends `episode-${string}` ? Promise<Episode | null>
   : never;
-export type CacheValue = Promise<SongInfo | ArtistInfo | AlbumInfo | Episode | null>;
+export type CacheValue = Promise<
+  Channel[] | EpisodeList | SongInfo | ArtistInfo | AlbumInfo | Episode | null
+>;
 
 export class Cache {
   #cache: LRUCache<CacheKey, CacheValue>;

@@ -5,7 +5,7 @@ import { Channel } from '@patrickkfkan/rp.js';
 
 export async function getChannelsPage(): Promise<Display.Page> {
   const rpjs = rp2.getRpjsLib();
-  const channels = await rpjs.getChannels();
+  const channels = await rp2.cacheOrGet('channels', () => rpjs.getChannels());
   const list: Display.List = {
     title: rp2.getI18n('RP2_CHANNELS'),
     items: channels.map((channel) => {
@@ -53,15 +53,5 @@ export async function getChannelsPage(): Promise<Display.Page> {
       },
       lists: [list]
     }
-  };
-}
-
-function getEpisodicRadioItem(channel: Channel) {
-  return {
-    service: 'rp2',
-    uri: `rp2/episodes@channel=${encodeURIComponent(channel.id)}`,
-    title: channel.title,
-    artist: rp2.getI18n('RP2_RP'),
-    albumart: channel.images.default ?? undefined
   };
 }

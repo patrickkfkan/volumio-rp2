@@ -4,16 +4,24 @@ import { type QueueItem } from '../playback/types';
 
 const ITEMS_PER_PAGE = 41;
 
-export async function getEpisodesPage(channel: string, page = 1): Promise<Display.Page> {
+export async function getEpisodesPage(
+  channel: string,
+  page = 1
+): Promise<Display.Page> {
   const rpjs = rp2.getRpjsLib();
-  const { episodes, start, total } = await rpjs.getEpisodeList({
-    limit: ITEMS_PER_PAGE,
-    start: (page - 1) * ITEMS_PER_PAGE
-  });
+  const { episodes, start, total } = await rp2.cacheOrGet(
+    `episodes-page-${page}`,
+    () =>
+      rpjs.getEpisodeList({
+        limit: ITEMS_PER_PAGE,
+        start: (page - 1) * ITEMS_PER_PAGE
+      })
+  );
   const list: Display.List = {
     title: rp2.getI18n('RP2_EPISODES'),
     items: episodes.map((episode) => {
-      const albumart = episode.bioImage.large || episode.episodeImage.large || undefined;
+      const albumart =
+        episode.bioImage.large || episode.episodeImage.large || undefined;
       const guests = episode.guests.map((guest) => guest.name).join(', ');
       const date = episode.date.split('T').at(0);
       const qi = JSON.stringify({
