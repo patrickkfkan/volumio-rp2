@@ -30,27 +30,8 @@ type CacheValue = Promise<SongInfo | ArtistInfo | AlbumInfo | Episode | null>;
 export class RP2NowPlayingMetadataProvider implements NowPlayingMetadataProvider {
   version: '1.0.0';
 
-  #cache: LRUCache<CacheKey, CacheValue>;
-
   constructor() {
     this.version = '1.0.0';
-    this.#cache = new LRUCache({
-      max: 100,
-      ttl: 600000 // 10mins
-    });
-  }
-
-  #cacheOrGet<K extends CacheKey>(
-    key: K,
-    get: () => CacheRecord<K>
-  ): CacheRecord<K> {
-    let v = this.#cache.get(key) as CacheRecord<K> | undefined;
-    if (v !== undefined) {
-      return v;
-    }
-    v = get();
-    this.#cache.set(key, v);
-    return v;
   }
 
   async #rpGetSongInfo() {
@@ -60,7 +41,7 @@ export class RP2NowPlayingMetadataProvider implements NowPlayingMetadataProvider
       const trackId = track.id;
       return {
         type: 'song' as const,
-        info: await this.#cacheOrGet(`song-info-${trackId}`, () =>
+        info: await rp2.cacheOrGet(`song-info-${trackId}`, () =>
           rp.getSongInfo({ songId: trackId })
         )
       };
@@ -69,7 +50,7 @@ export class RP2NowPlayingMetadataProvider implements NowPlayingMetadataProvider
       const episodeId = track.episodeId;
       return {
         type: 'episode' as const,
-        info: await this.#cacheOrGet(`episode-${episodeId}`, () =>
+        info: await rp2.cacheOrGet(`episode-${episodeId}`, () =>
           rp.getEpisode({ episodeId: episodeId })
         )
       };
@@ -149,7 +130,7 @@ export class RP2NowPlayingMetadataProvider implements NowPlayingMetadataProvider
           if (!albumId) {
             return null;
           }
-          const albumInfo = await this.#cacheOrGet(`album-info-${albumId}`, () =>
+          const albumInfo = await rp2.cacheOrGet(`album-info-${albumId}`, () =>
             rp.getAlbumInfo({ albumId: albumId })
           );
           if (!albumInfo) {
@@ -184,7 +165,7 @@ export class RP2NowPlayingMetadataProvider implements NowPlayingMetadataProvider
           if (!artistId) {
             return null;
           }
-          const artistInfo = await this.#cacheOrGet(`artist-info-${artistId}`, () =>
+          const artistInfo = await rp2.cacheOrGet(`artist-info-${artistId}`, () =>
             rp.getArtistInfo({ artistId })
           );
           if (!artistInfo) {
@@ -230,9 +211,5 @@ export class RP2NowPlayingMetadataProvider implements NowPlayingMetadataProvider
     return text
       .replace(/\n\s*\n\s*\n+/g, '\n\n') // Collapses 2+ blank lines into 1
       .trim();
-  }
-
-  reset() {
-    this.#cache.clear();
   }
 }

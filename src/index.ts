@@ -96,7 +96,6 @@ class ControllerRP2 {
   onStop() {
     this.#commandRouter.volumioRemoveToBrowseSources(SERVICE_NAME);
     this.#playController = null;
-    this.#nowPlayingMetadataProvider?.reset();
     this.#nowPlayingMetadataProvider = null;
     return jsPromiseToKew(
       (async () => {
