@@ -14,6 +14,8 @@
   "RP2_SAVE": "Save",
   "RP2_SETTINGS_SAVED": "Settings saved",
   "RP2_CHANNELS": "Channels",
+  "RP2_EPISODES": "Episodes",
+  "RP2_MORE": "More",
   "RP2_STARTING_PLAYER": "Starting {} for playback...",
   "RP2_ERR_PLAYER_START": "Failed to start {}: {}",
   "RP2_ERR_PLAYER_QUIT": "Failed to quit {}: {}",
