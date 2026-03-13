@@ -61,12 +61,15 @@ class ControllerRP2 {
     };
     generalUIConf.content.persistSession.value =
       rp2.getConfigValue('persistSession');
+    generalUIConf.content.showChannel.value =
+      rp2.getConfigValue('showChannel');
 
     return uiconf;
   }
 
   async configSaveGeneralSettings(data: any) {
     rp2.setConfigValue('persistSession', !!data['persistSession']);
+    rp2.setConfigValue('showChannel', !!data['showChannel']);
     const audioQuality = data['audioQuality']?.value;
     if (audioQuality) {
       rp2.setConfigValue('audioQuality', audioQuality);
